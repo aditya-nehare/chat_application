@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import express from "express";
 import path from "path";
 
+import { connectDB } from "./lib/db.js";
 import authRoute from "./routes/auth.route.js";
 import msgRoute from "./routes/msg.route.js";
-import { connectDB } from "./lib/db.js";
 
 const app = express();
 const port = process.env.PORT;
@@ -24,7 +24,13 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(port, () => {
-  console.log("server listening on port 3000");
-  connectDB();
-});
+connectDB()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`server listening on port : ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB: " + err);
+    process.exit(1);
+  });
