@@ -5,10 +5,13 @@ import path from "path";
 
 import authRoute from "./routes/auth.route.js";
 import msgRoute from "./routes/msg.route.js";
+import { connectDB } from "./lib/db.js";
 
 const app = express();
 const port = process.env.PORT;
 const __dirname = path.resolve();
+
+app.use(express.json()); //So that we get access to user input from forms i.e. req.body
 
 app.use("/api/auth", authRoute);
 app.use("/api/message", msgRoute);
@@ -23,4 +26,5 @@ if (process.env.NODE_ENV === "production") {
 
 app.listen(port, () => {
   console.log("server listening on port 3000");
+  connectDB();
 });
