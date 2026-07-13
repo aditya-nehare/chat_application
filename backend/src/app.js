@@ -1,14 +1,13 @@
-dotenv.config();
-import dotenv from "dotenv";
 import express from "express";
 import path from "path";
+import { ENV } from "./lib/env.js";
 
 import { connectDB } from "./lib/db.js";
 import authRoute from "./routes/auth.route.js";
 import msgRoute from "./routes/msg.route.js";
 
 const app = express();
-const port = process.env.PORT;
+const port = ENV.PORT;
 const __dirname = path.resolve();
 
 app.use(express.json()); //So that we get access to user input from forms i.e. req.body
@@ -16,7 +15,7 @@ app.use(express.json()); //So that we get access to user input from forms i.e. r
 app.use("/api/auth", authRoute);
 app.use("/api/message", msgRoute);
 
-if (process.env.NODE_ENV === "production") {
+if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
   app.get("*", (_, res) => {
