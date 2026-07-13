@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import express from "express";
 import path from "path";
 import { ENV } from "./lib/env.js";
@@ -11,6 +12,7 @@ const port = ENV.PORT;
 const __dirname = path.resolve();
 
 app.use(express.json()); //So that we get access to user input from forms i.e. req.body
+app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/message", msgRoute);
