@@ -49,11 +49,11 @@ export const signup = async (req, res) => {
 
     generateToken(newUser._id, res);
 
-    try {
-      await sendWelcomeEmail(newUser.email, newUser.fullName, ENV.CLIENT_URL);
-    } catch (error) {
-      console.error("Failed to send email:", error);
-    }
+    sendWelcomeEmail(newUser.email, newUser.fullName, ENV.CLIENT_URL).catch(
+      (error) => {
+        console.error("Failed to send welcome email: ", error);
+      },
+    );
 
     return res.status(201).json({
       _id: newUser._id,
