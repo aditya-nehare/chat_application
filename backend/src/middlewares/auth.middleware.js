@@ -4,7 +4,7 @@ import User from "../models/User.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.cookie.jwt;
+    const token = req.cookies.jwt;
     if (!token) {
       return res
         .status(401)
@@ -12,8 +12,6 @@ export const protectRoute = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, ENV.JWT_SECRET);
-    if (!decoded)
-      return res.status(401).json({ message: "Unauthorized - Invlaid token" });
 
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) return res.status(404).json({ message: "User Not found" });
@@ -21,6 +19,10 @@ export const protectRoute = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("Error in protectRoute Middleware " + error.message);
+    console.error("Error in protectRoute Middleware:", error.message);
+
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
   }
 };
