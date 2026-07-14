@@ -5,9 +5,12 @@ import {
   signup,
   updateProfile,
 } from "../controller/auth.controller.js";
+import { arjetProtection } from "../middlewares/arjet.middleware.js";
 import { protectRoute } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
+
+router.use(arjetProtection);
 
 router.post("/signup", signup);
 router.post("/login", login);
