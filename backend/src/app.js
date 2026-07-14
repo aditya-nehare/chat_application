@@ -15,7 +15,7 @@ app.use(express.json()); //So that we get access to user input from forms i.e. r
 app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
-app.use("/api/message", msgRoute);
+app.use("/api/messages", msgRoute);
 
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
