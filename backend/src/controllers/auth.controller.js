@@ -92,7 +92,7 @@ export const login = async (req, res) => {
       _id: user._id,
       fullName: user.fullName,
       email: user.email,
-      ProfilePic: user.ProfilePic,
+      profilePic: user.profilePic,
     });
   } catch (error) {
     console.error("Error in Login " + error.message);
@@ -101,9 +101,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = (_, res) => {
-  res.cookie("jwt", {
-    maxAge: 0,
-  });
+  res.clearCookie("jwt");
   res.status(200).json({ message: "Logout Successfully" });
 };
 
@@ -114,17 +112,17 @@ export const updateProfile = async (req, res) => {
       res.status(400).json({ message: "Profile picture is required" });
 
     const userId = req.user._id;
-    const uploadResponce = await cloudinary.upload(profilePic);
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
 
     const updateUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponce.secure_url },
+      { profilePic: uploadResponse.secure_url },
       { new: true },
     );
 
     res.status(200).json(updateUser);
   } catch (error) {
     console.error("Error in Updating Profile: ", error.message);
-    res.status(500).json({message : "Internal Server error"})
+    res.status(500).json({ message: "Internal Server error" });
   }
 };
