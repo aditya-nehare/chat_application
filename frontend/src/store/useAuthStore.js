@@ -30,7 +30,11 @@ export const useAuthStore = create((set) => ({
       onsole.log("Success message");
       toast.success("Accout created successfully");
     } catch (error) {
-      toast.error("This is a test error");
+      const msg =
+        error?.response?.data?.message ??
+        error?.message ??
+        "Something went wrong. Please try again";
+      toast.error(msg);
     } finally {
       set({ isSigningUp: false });
     }
