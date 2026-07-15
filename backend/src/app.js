@@ -1,6 +1,8 @@
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import express from "express";
 import path from "path";
+
 import { ENV } from "./lib/env.js";
 
 import { connectDB } from "./lib/db.js";
@@ -12,6 +14,7 @@ const port = ENV.PORT;
 const __dirname = path.resolve();
 
 app.use(express.json()); //So that we get access to user input from forms i.e. req.body
+app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
