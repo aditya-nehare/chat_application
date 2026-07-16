@@ -46,28 +46,38 @@ export const signup = async (req, res) => {
       password: hashedPassword,
     });
 
-    await newUser.save();
+    if (newUser) {
+      // before CR:
+      // generateToken(newUser._id, res);
+      // await newUser.save();
 
-    generateToken(newUser._id, res);
+      // after CR:
+      // Persist user first, then issue auth cookie
+      const savedUser = await newUser.save();
+      generateToken(savedUser._id, res);
 
-    sendWelcomeEmail(newUser.email, newUser.fullName, ENV.CLIENT_URL).catch(
-      (error) => {
-        console.error("Failed to send welcome email: ", error);
-      },
-    );
+      res.status(201).json({
+        _id: newUser._id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        profilePic: newUser.profilePic,
+      });
 
-    return res.status(201).json({
-      _id: newUser._id,
-      fullName: newUser.fullName,
-      email: newUser.email,
-      profilePic: newUser.profilePic,
-    });
+      try {
+        await sendWelcomeEmail(
+          savedUser.email,
+          savedUser.fullName,
+          ENV.CLIENT_URL,
+        );
+      } catch (error) {
+        console.error("Failed to send welcome email:", error);
+      }
+    } else {
+      res.status(400).json({ message: "Invalid user data" });
+    }
   } catch (error) {
-    console.error("Signup Error:", error);
-
-    return res.status(500).json({
-      message: "Internal Server Error",
-    });
+    console.log("Error in signup controller:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -101,28 +111,44 @@ export const login = async (req, res) => {
 };
 
 export const logout = (_, res) => {
-  res.clearCookie("jwt");
-  res.status(200).json({ message: "Logout Successfully" });
+  res.cookie("jwt", "", { maxAge: 0 });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic } = req.body;
     if (!profilePic)
-      res.status(400).json({ message: "Profile picture is required" });
+      return res.status(400).json({ message: "Profile pic is required" });
 
     const userId = req.user._id;
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
 
-    const updateUser = await User.findByIdAndUpdate(
+    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    console.log(uploadResponse);
+
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       { profilePic: uploadResponse.secure_url },
       { new: true },
     );
+    console.log(updatedUser);
 
-    res.status(200).json(updateUser);
+    res.status(200).json(updatedUser);
   } catch (error) {
-    console.error("Error in Updating Profile: ", error.message);
-    res.status(500).json({ message: "Internal Server error" });
+    console.log("Error in update profile: ", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
   }
 };

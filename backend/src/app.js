@@ -13,7 +13,8 @@ const app = express();
 const port = ENV.PORT;
 const __dirname = path.resolve();
 
-app.use(express.json()); //So that we get access to user input from forms i.e. req.body
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
