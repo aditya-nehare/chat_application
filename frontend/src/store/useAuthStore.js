@@ -31,11 +31,7 @@ export const useAuthStore = create((set) => ({
       onsole.log("Success message");
       toast.success("Accout created successfully");
     } catch (error) {
-      const msg =
-        error?.response?.data?.message ??
-        error?.message ??
-        "Something went wrong. Please try again";
-      toast.error(msg);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isSigningUp: false });
     }
@@ -51,7 +47,7 @@ export const useAuthStore = create((set) => ({
 
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       set({ isLoggingIn: false });
     }
