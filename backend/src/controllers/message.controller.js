@@ -69,6 +69,11 @@ export const sendMsg = async (req, res) => {
 
     // ! send msg in real time - socket.io
 
+    console.log("Logged in:", req.user.fullName);
+    console.log("Sender:", req.user._id);
+    console.log("Receiver:", req.params.id);
+
+    console.log(newMsg);
     res.status(201).json(newMsg);
   } catch (error) {
     console.log("Error in sendMessage controller: ", error.message);
